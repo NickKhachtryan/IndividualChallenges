@@ -1,0 +1,18 @@
+/* 
+  Localizable.strings
+  ColorMixerApp
+
+  Created by Nick Khachatryan on 27.01.2025.
+  
+*/
+"Color mixer" = "Color mixer";
+"Red" = "Red";
+"Blue" = "Blue";
+"Green" = "Green";
+"Yellow" = "Yellow";
+"Orange" = "Orange";
+"Purple" = "Purple";
+"Brown" = "Brown";
+"Gray" = "Gray";
+"Black" = "Black";
+"White" = "White";

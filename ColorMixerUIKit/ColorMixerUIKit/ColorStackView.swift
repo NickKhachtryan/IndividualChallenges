@@ -7,23 +7,31 @@
 
 import UIKit
 
-class ColorStackView: UIView {
-    private let colorLabel: UILabel = {
+class ColorStackView: UIView, UIColorPickerViewControllerDelegate {
+    
+    
+    //MARK: - PUBLIC PROPERTIES
+    weak var viewController: UIViewController?
+    weak var delegate: ColorStackViewDelegate?
+    
+    
+    //MARK: - PRIVATE PROPERTIES
+    var colorLabel: UILabel = {
         let label = UILabel()
         label.text = "RED"
-        label.font = UIFont(name: "Avenir Next", size: 16)
+        label.font = UIFont(name: "Avenir Next Bold", size: 16)
         label.textAlignment = .center
-//        label.backgroundColor = .red
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let colorRectangle: UIView = {
-        let view = UIView()
-        view.tintColor = .red
-        view.backgroundColor = .red
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    var colorRectangle: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .red
+        button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(didTapSelectColor), for: .touchUpInside)
+        return button
     }()
     
     private let colorStackView: UIStackView = {
@@ -31,11 +39,12 @@ class ColorStackView: UIView {
         stackView.axis = .vertical
         stackView.spacing = 5
         stackView.distribution = .fill
-        stackView.backgroundColor = .yellow
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
     
+    
+    //MARK: - INITIALIZATORS
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUpView()
@@ -46,24 +55,54 @@ class ColorStackView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setUpView() {
+    
+    //MARK: - METHODS
+    private func setUpView() {
         translatesAutoresizingMaskIntoConstraints = false
         addSubview(colorStackView)
         colorStackView.addArrangedSubview(colorLabel)
         colorStackView.addArrangedSubview(colorRectangle)
     }
+    
+    @objc func didTapSelectColor() {
+        guard let viewController = viewController else {
+            print("ViewController is not set")
+            return
+        }
+        
+        let colorPickerVC = UIColorPickerViewController()
+        colorPickerVC.selectedColor = colorRectangle.backgroundColor ?? .red
+        colorPickerVC.modalPresentationStyle = .popover
+        colorPickerVC.delegate = self
+        viewController.present(colorPickerVC, animated: true, completion: nil)
+    }
+    
+    func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        colorRectangle.backgroundColor = color
+        delegate?.colorDidChange()
+    }
+    
+    func colorPickerViewControllerDidSelectColor(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        colorRectangle.backgroundColor = color
+        delegate?.colorDidChange()
+    }
 }
 
-extension ColorStackView {
+
+//MARK: - CONSTRAINTS
+private extension ColorStackView {
     func setUpConstraints() {
-        
         NSLayoutConstraint.activate([
+            colorRectangle.widthAnchor.constraint(equalTo: colorRectangle.heightAnchor),
             
             colorStackView.topAnchor.constraint(equalTo: topAnchor),
             colorStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
             colorStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             colorStackView.trailingAnchor.constraint(equalTo: trailingAnchor)
-
+            
         ])
     }
 }
+
